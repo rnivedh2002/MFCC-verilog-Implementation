@@ -38,7 +38,7 @@ module mel_filter_bank (
     wire [15:0] power_6 = (fft_real_6 * fft_real_6) + (fft_imag_6 * fft_imag_6);
     wire [15:0] power_7 = (fft_real_7 * fft_real_7) + (fft_imag_7 * fft_imag_7);
 
-    // Simple Mel filter weights (Q1.7): 127 for active bins, 0 otherwise
+    
     reg [7:0] weights [0:2][0:7];
     always @(posedge clk or posedge rst) begin
         if (rst) begin
