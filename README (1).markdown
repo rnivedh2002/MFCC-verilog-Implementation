@@ -59,5 +59,3 @@ mfcc-verilog-pipeline/
 ## Contributing
 Submit issues or pull requests for enhancements, especially for framing/windowing or missing modules.
 
-## License
-MIT License
