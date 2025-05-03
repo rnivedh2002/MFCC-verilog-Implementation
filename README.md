@@ -36,7 +36,7 @@ Complete Module Set: Implement fft_8point and ensure all modules are fully funct
 
 # Getting Started
 
-Clone the Repository:git clone https://github.com/your-username/mfcc-verilog-pipeline.git
+Clone the Repository:git clone https://github.com/rnivedh2002/mfcc-verilog-pipeline.git
 
 
 Add Verilog Files: Place module files in src/ and testbenches in testbenches/.
