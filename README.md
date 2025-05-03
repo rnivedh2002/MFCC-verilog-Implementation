@@ -29,7 +29,7 @@ The MFCC pipeline processes audio signals using 8-bit fixed-point arithmetic acr
 - **Thermal Mitigation**: Add heat sinks or reduce clock frequency to manage 125.0°C junction temperature.
 - **I/O Optimization**: Use pin multiplexing to reduce 39.25% I/O usage.
 - **Enhanced Accuracy**: Implement dynamic range scaling or additional Mel filter bands.
-- **Real-World Synthesis**: Synthesize on Xilinx Spartan-6 for hardware validation.
+- **Real-World Synthesis**: Synthesize on Xilinx Artix-7 for hardware validation.
 - **Complete Module Set**: Fully implement all modules, including `fft_8point`.
 
 ## Getting Started
@@ -39,7 +39,7 @@ The MFCC pipeline processes audio signals using 8-bit fixed-point arithmetic acr
    ```
 2. **Add Modules**: Place Verilog files in `src/` and testbenches in `testbenches/`.
 3. **Simulate**: Run `tb_mfcc_pipeline.v` in Vivado with inputs like -64, 64, 32.
-4. **Synthesize**: Target a low-resource FPGA (e.g., Xilinx Spartan-6).
+4. **Synthesize**: Target a low-resource FPGA (e.g., Xilinx Artix-7).
 
 ## Directory Structure
 ```plaintext
