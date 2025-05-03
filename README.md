@@ -1,111 +1,49 @@
 MFCC Verilog Pipeline
-
-This repository contains a Verilog HDL implementation of an 8-bit Mel-Frequency Cepstral Coefficient (MFCC) pipeline designed for low-resource FPGAs, targeting real-time speech feature extraction for speech synthesis applications. The pipeline processes audio signals through a series of stages to generate MFCC coefficients, optimized for low latency and minimal resource usage.
-
+This repository hosts a Verilog HDL implementation of an 8-bit Mel-Frequency Cepstral Coefficient (MFCC) pipeline tailored for low-resource FPGAs. The pipeline is designed for real-time speech feature extraction, enabling applications like speech synthesis in resource-constrained environments. It processes audio signals through pre-emphasis, FFT, Mel filter bank, logarithm, and DCT stages, using 8-bit fixed-point arithmetic for efficiency.
 Project Overview
+The MFCC pipeline aims to deliver low-latency, resource-efficient speech processing. Key metrics include:
 
-The MFCC pipeline is designed to extract cepstral features from audio inputs using 8-bit fixed-point arithmetic. It includes stages for pre-emphasis, FFT, Mel filter bank, logarithm computation, and discrete cosine transform (DCT). The design achieves low resource utilization (e.g., 1.51% LUTs, 0.16% FFs) and a latency of ~1100 ns at 100 MHz, but faces challenges with high power consumption (88.781 W) and I/O utilization (39.25%).
+Resource Usage: 1.51% LUTs (2026/133,800), 0.16% FFs (431/267,600), 1.49% DSPs (11/740), 39.25% IOs (157/400).
+Latency: ~1100 ns (11 clock cycles at 100 MHz).
+Power: 88.781 W total, with 98% dynamic power, though high junction temperature (125.0°C) poses thermal challenges.
 
 Modules
+The project includes the following Verilog modules:
 
+src/butterfly_twiddle.v: Stores twiddle factors for FFT.
+src/butterfly.v: Implements a butterfly stage for FFT.
+src/dct3.v: Computes 3-point DCT for MFCC coefficients.
+src/log_lut.v: Performs logarithm via lookup table.
+src/mel_filter_bank.v: Applies Mel-scale filtering.
+src/pre_emphasis.v: Enhances high-frequency components.
+src/mfcc_pipeline.v: Integrates all stages.
+testbenches/tb_mfcc_pipeline.v: Testbench with inputs (e.g., -64, 64, 32).
 
+Current Limitations
 
-
-
-butterfly_twiddle.v: Stores twiddle factors for FFT.
-
-
-
-butterfly.v: Implements a butterfly stage for FFT.
-
-
-
-dct3.v: Performs 3-point DCT for MFCC coefficients.
-
-
-
-log_lut.v: Computes logarithms using a lookup table.
-
-
-
-mel_filter_bank.v: Applies Mel-scale filtering.
-
-
-
-tb_mfcc_pipeline.v: Testbench for the MFCC pipeline.
-
-
-
-pre_emphasis.v: Enhances high-frequency signal components.
-
-
-
-mfcc_pipeline.v: Top-level module integrating all stages.
-
-Current Issues
-
-
-
-
-
-Missing Framing and Windowing: The pipeline lacks framing and windowing stages, which are critical for segmenting audio signals and reducing spectral leakage. Currently, MFCC coefficients are derived directly from FFT inputs.
-
-
-
-Incomplete Module Set: Some modules (e.g., fft_8point) are referenced but not fully implemented in this repository.
+No Framing or Windowing: The pipeline lacks framing and windowing stages, essential for audio segmentation and spectral smoothing. MFCCs are currently computed directly from FFT inputs, which may affect accuracy.
+Incomplete Modules: The fft_8point module, critical for the FFT stage, is referenced but not implemented in this repository, limiting full functionality.
 
 Future Work
+To address limitations and enhance performance, the following tasks are planned:
+
+Framing and Windowing: Develop modules for signal framing and windowing (e.g., Hamming window) to improve spectral analysis.
+Thermal Mitigation: Add heat sinks or lower clock frequency to manage 125.0°C junction temperature.
+I/O Optimization: Implement pin multiplexing to reduce 39.25% I/O usage.
+Enhanced Accuracy: Introduce dynamic range scaling or additional Mel filter bands for better frequency resolution.
+Real-World Synthesis: Synthesize on a Xilinx Spartan-6 FPGA to validate hardware performance.
+Complete Module Set: Implement fft_8point and ensure all modules are fully functional.
+
+Getting Started
+
+Clone the Repository:git clone https://github.com/your-username/mfcc-verilog-pipeline.git
 
 
-
-
-
-Framing and Windowing: Add modules for audio signal framing and windowing (e.g., Hamming window) to improve spectral analysis.
-
-
-
-Thermal Mitigation: Implement heat sinks or reduce clock frequency to manage high junction temperatures (125.0°C).
-
-
-
-I/O Optimization: Use pin multiplexing to reduce I/O utilization (39.25%).
-
-
-
-Enhanced Accuracy: Explore dynamic range scaling or additional Mel filter bands for better frequency resolution.
-
-
-
-Real-World Synthesis: Synthesize on a target FPGA (e.g., Xilinx Spartan-6) to validate hardware performance.
-
-
-
-Complete Module Set: Develop or include missing modules (e.g., fft_8point) for a fully functional pipeline.
-
-Setup Instructions
-
-
-
-
-
-Clone the Repository:
-
-git clone https://github.com/your-username/mfcc-verilog-pipeline.git
-
-
-
-Add Modules: Place Verilog files in the src/ directory.
-
-
-
-Simulate: Use Vivado to run the tb_mfcc_pipeline.v testbench.
-
-
-
-Synthesize: Target a low-resource FPGA for synthesis.
+Add Verilog Files: Place module files in src/ and testbenches in testbenches/.
+Simulate: Use Vivado to run tb_mfcc_pipeline.v with inputs like -64, 64, 32.
+Synthesize: Target a low-resource FPGA (e.g., Xilinx Spartan-6) for synthesis.
 
 Directory Structure
-
 mfcc-verilog-pipeline/
 ├── src/
 │   ├── butterfly_twiddle.v
@@ -119,3 +57,6 @@ mfcc-verilog-pipeline/
 │   ├── tb_mfcc_pipeline.v
 ├── README.md
 ├── .gitignore
+
+Contributing
+Contributions are welcome! Please open an issue or submit a pull request for enhancements, especially for framing/windowing or missing modules.
