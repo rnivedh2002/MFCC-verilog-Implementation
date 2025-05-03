@@ -1,7 +1,8 @@
 # MFCC Verilog Pipeline
 This repository hosts a Verilog HDL implementation of an 8-bit Mel-Frequency Cepstral Coefficient (MFCC) pipeline tailored for low-resource FPGAs. The pipeline is designed for real-time speech feature extraction, enabling applications like speech synthesis in resource-constrained environments. It processes audio signals through pre-emphasis, FFT, Mel filter bank, logarithm, and DCT stages, using 8-bit fixed-point arithmetic for efficiency.
 # Project Overview
-The MFCC pipeline aims to deliver low-latency, resource-efficient speech processing. Key metrics include:
+The MFCC pipeline aims to deliver low-latency, resource-efficient speech processing. 
+# Key metrics include:
 
 Resource Usage: 1.51% LUTs (2026/133,800), 0.16% FFs (431/267,600), 1.49% DSPs (11/740), 39.25% IOs (157/400).
 Latency: ~1100 ns (11 clock cycles at 100 MHz).
