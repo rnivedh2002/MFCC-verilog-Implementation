@@ -61,6 +61,3 @@ mfcc-verilog-pipeline/
 
 ## Contributing
 Submit issues or pull requests, especially for framing/windowing, deep learning integration, or module implementation.
-
-## License
-MIT License
