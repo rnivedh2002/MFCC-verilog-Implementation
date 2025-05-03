@@ -1,0 +1,48 @@
+module FFT_8point (
+    input wire clk,
+    input wire reset,
+    input wire start,
+    input wire signed [7:0] in0_real, in1_real, in2_real, in3_real, in4_real, in5_real, in6_real, in7_real,
+    input wire signed [7:0] in0_imag, in1_imag, in2_imag, in3_imag, in4_imag, in5_imag, in6_imag, in7_imag,
+    output wire signed [7:0] out0_real, out1_real, out2_real, out3_real, out4_real, out5_real, out6_real, out7_real,
+    output wire signed [7:0] out0_imag, out1_imag, out2_imag, out3_imag, out4_imag, out5_imag, out6_imag, out7_imag,
+    output reg ready
+);
+    // Stage 1: Butterfly pairs (0,4), (1,5), (2,6), (3,7)
+    wire signed [7:0] s1_cr0, s1_ci0, s1_cr1, s1_ci1, s1_cr2, s1_ci2, s1_cr3, s1_ci3;
+    wire signed [7:0] s1_cr4, s1_ci4, s1_cr5, s1_ci5, s1_cr6, s1_ci6, s1_cr7, s1_ci7;
+
+    butterfly bf1_0 (.clk(clk), .rst(reset), .ar1(in0_real), .ai1(in0_imag), .ar2(in4_real), .ai2(in4_imag), .cr1(s1_cr0), .ci1(s1_ci0), .cr2(s1_cr4), .ci2(s1_ci4));
+    butterfly bf1_1 (.clk(clk), .rst(reset), .ar1(in1_real), .ai1(in1_imag), .ar2(in5_real), .ai2(in5_imag), .cr1(s1_cr1), .ci1(s1_ci1), .cr2(s1_cr5), .ci2(s1_ci5));
+    butterfly bf1_2 (.clk(clk), .rst(reset), .ar1(in2_real), .ai1(in2_imag), .ar2(in6_real), .ai2(in6_imag), .cr1(s1_cr2), .ci1(s1_ci2), .cr2(s1_cr6), .ci2(s1_ci6));
+    butterfly bf1_3 (.clk(clk), .rst(reset), .ar1(in3_real), .ai1(in3_imag), .ar2(in7_real), .ai2(in7_imag), .cr1(s1_cr3), .ci1(s1_ci3), .cr2(s1_cr7), .ci2(s1_ci7));
+
+    // Stage 2: Butterfly pairs (0,2), (1,3), (4,6), (5,7) with twiddle factors
+    wire signed [7:0] s2_cr0, s2_ci0, s2_cr1, s2_ci1, s2_cr2, s2_ci2, s2_cr3, s2_ci3;
+    wire signed [7:0] s2_cr4, s2_ci4, s2_cr5, s2_ci5, s2_cr6, s2_ci6, s2_cr7, s2_ci7;
+
+    // Twiddle factors (Q1.7): W_8^0 = 1, W_8^1 = 0.707 - j0.707, W_8^2 = -j
+    wire signed [7:0] W_8_0_r = 8'd127, W_8_0_i = 8'd0;
+    wire signed [7:0] W_8_1_r = 8'd90,  W_8_1_i = -8'd90;
+    wire signed [7:0] W_8_2_r = 8'd0,   W_8_2_i = -8'd127;
+
+    butterfly bf2_0 (.clk(clk), .rst(reset), .ar1(s1_cr0), .ai1(s1_ci0), .ar2(s1_cr2), .ai2(s1_ci2), .cr1(s2_cr0), .ci1(s2_ci0), .cr2(s2_cr2), .ci2(s2_ci2));
+    butterfly_twiddle bf2_1 (.clk(clk), .rst(reset), .ar1(s1_cr1), .ai1(s1_ci1), .ar2(s1_cr3), .ai2(s1_ci3), .W_r(W_8_1_r), .W_i(W_8_1_i), .cr1(s2_cr1), .ci1(s2_ci1), .cr2(s2_cr3), .ci2(s2_ci3));
+    butterfly bf2_2 (.clk(clk), .rst(reset), .ar1(s1_cr4), .ai1(s1_ci4), .ar2(s1_cr6), .ai2(s1_ci6), .cr1(s2_cr4), .ci1(s2_ci4), .cr2(s2_cr6), .ci2(s2_ci6));
+    butterfly_twiddle bf2_3 (.clk(clk), .rst(reset), .ar1(s1_cr5), .ai1(s1_ci5), .ar2(s1_cr7), .ai2(s1_ci7), .W_r(W_8_1_r), .W_i(W_8_1_i), .cr1(s2_cr5), .ci1(s2_ci5), .cr2(s2_cr7), .ci2(s2_ci7));
+
+    // Stage 3: Butterfly pairs (0,1), (2,3), (4,5), (6,7)
+    butterfly bf3_0 (.clk(clk), .rst(reset), .ar1(s2_cr0), .ai1(s2_ci0), .ar2(s2_cr1), .ai2(s2_ci1), .cr1(out0_real), .ci1(out0_imag), .cr2(out1_real), .ci2(out1_imag));
+    butterfly_twiddle bf3_1 (.clk(clk), .rst(reset), .ar1(s2_cr2), .ai1(s2_ci2), .ar2(s2_cr3), .ai2(s2_ci3), .W_r(W_8_2_r), .W_i(W_8_2_i), .cr1(out2_real), .ci1(out2_imag), .cr2(out3_real), .ci2(out3_imag));
+    butterfly bf3_2 (.clk(clk), .rst(reset), .ar1(s2_cr4), .ai1(s2_ci4), .ar2(s2_cr5), .ai2(s2_ci5), .cr1(out4_real), .ci1(out4_imag), .cr2(out5_real), .ci2(out5_imag));
+    butterfly_twiddle bf3_3 (.clk(clk), .rst(reset), .ar1(s2_cr6), .ai1(s2_ci6), .ar2(s2_cr7), .ai2(s2_ci7), .W_r(W_8_2_r), .W_i(W_8_2_i), .cr1(out6_real), .ci1(out6_imag), .cr2(out7_real), .ci2(out7_imag));
+
+    // Simple control: ready after start
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            ready <= 1'b0;
+        end else begin
+            ready <= start;
+        end
+    end
+endmodule
